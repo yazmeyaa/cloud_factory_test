@@ -19,7 +19,6 @@ function isEqualByColumns(obj1: any, obj2: any, keys: string[]) {
 
 const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
     const prevQuotes = useRef<PoloniexAdapterResultType>(quotes)
-    const rowsWithDifferences = useRef<boolean[]>(Array(quotes.length - 1).fill(false))
     const [changedRows, setChangedRows] = useState<number[]>([]);
 
     const columnsMap = {

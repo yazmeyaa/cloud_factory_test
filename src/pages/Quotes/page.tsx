@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom"
+import { Link } from "components/link"
+import './page.scss'
 
 export const QuotesPage = () => {
     return (
         <div>
             <h1>Выберите источник:</h1>
             <nav>
-                <ul>
+                <ul className="quotes_list">
                     <li>
                         <Link to={'/quotes/poloniex'}>Poloniex</Link>
                     </li>

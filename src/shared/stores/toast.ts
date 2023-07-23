@@ -34,7 +34,7 @@ export class Toasts {
 
     public removeToastById(id: number) {
         const filtered = this.toasts.filter(item => item.id !== id)
-        this.toasts = structuredClone(filtered)
+        this.toasts = filtered
     }
 
     public removeAllToasts() {

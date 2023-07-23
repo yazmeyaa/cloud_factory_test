@@ -1,0 +1,16 @@
+.link {
+    color: #0043ce;
+    text-decoration: underline;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.28572;
+    letter-spacing: 0.16px;
+    display: inline-flex;
+    outline: none;
+    transition: color 70ms cubic-bezier(0.2, 0, 0.38, 0.9);
+
+    &:hover {
+        color: #0043ce;
+        
+    }
+}

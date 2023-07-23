@@ -1,13 +1,27 @@
-import { FC } from "react"
+import { FC, memo, useEffect, useRef, useState } from "react"
 import './style.scss'
 import { FormattedTickers, PoloniexAdapterResultType } from "helpers/poloniexDataAdapter"
+import { isEqual, pick } from 'lodash'
 
 export type QuoteTableProps = {
     quotes: PoloniexAdapterResultType
     onRowClick?: (quote: FormattedTickers) => void
 }
 
-export const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
+function isEqualByColumns(obj1: any, obj2: any, keys: string[]) {
+    for (const key of keys) {
+        if (obj1[key] !== obj2[key]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
+    const prevQuotes = useRef<PoloniexAdapterResultType>(quotes)
+    const rowsWithDifferences = useRef<boolean[]>(Array(quotes.length - 1).fill(false))
+    const [changedRows, setChangedRows] = useState<number[]>([]);
+
     const columnsMap = {
         displayName: "Название актива",
         last: "Цена последней сделки",
@@ -15,12 +29,26 @@ export const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
         percentChange: "Процент изменения цены"
     } as const
 
+    useEffect(() => {
+        const updatedRows: number[] = [];
+        for (let i = 0; i < quotes.length - 1; i++) {
+            if (!isEqualByColumns(quotes[i], prevQuotes.current[i], columnsKeys)) {
+                updatedRows.push(i);
+            }
+        }
+        setChangedRows(updatedRows);
+        prevQuotes.current = quotes;
+    }, [quotes]);
+
     const columnsKeys = Object.keys(columnsMap)
     const columns = Object.values(columnsMap)
-    console.log(quotes)
     function handleRowClick(quote: FormattedTickers) {
         onRowClick?.(quote)
     }
+
+    const handleAnimationEnd = (rowIdx: number) => {
+        setChangedRows((prevChangedRows) => prevChangedRows.filter((idx) => idx !== rowIdx));
+    };
 
     return (
         <div className="quote_table_container">
@@ -28,25 +56,47 @@ export const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
                 <thead>
                     <tr>
                         {columns.map((col, idx) => {
-                            return(
+                            return (
                                 <th key={idx}>{col}</th>
                             )
                         })}
                     </tr>
                 </thead>
                 <tbody>
-                        {quotes.map((row, rowIdx) => {
-                            return(
-                                <tr onClick={() => handleRowClick(row)} key={rowIdx}> {columnsKeys.map((item, colIdx) => {
-                                    const key = item as keyof typeof row
-                                    return (
-                                        <td key={`${rowIdx}:${colIdx}`}>{row[key]}</td>
-                                    )
-                                })} </tr>
-                            )
-                        })}
+                    {quotes.map((row, rowIdx) => {
+                        const isRowChanged = changedRows.includes(rowIdx);
+                        return (
+                            <tr
+                                className={isRowChanged ? 'has_changes' : undefined}
+                                onClick={() => handleRowClick(row)}
+                                key={rowIdx}
+                                onAnimationEnd={() => handleAnimationEnd(rowIdx)}
+                            >
+                                {columnsKeys.map((item, colIdx) => {
+                                    const key = item as keyof typeof row;
+                                    return <td key={`${rowIdx}:${colIdx}`}>{key === 'percentChange' ? `${parseFloat(row[key])}%` : row[key]}</td>;
+                                })}
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>
     )
 }
+
+const memoisedComponent = memo(QuoteTable, (prev, next) => {
+    if (prev.quotes.length !== next.quotes.length) {
+        return false; // If the lengths of quotes arrays are different, re-render the component.
+    }
+    let isDifferentArrays = false
+    for (let i = 0; i <= prev.quotes.length - 1; i++) {
+        if (isEqual(prev.quotes[i], next.quotes[i]) === false) {
+            isDifferentArrays = true
+            break;
+        }
+    }
+    return !isDifferentArrays
+})
+
+export { memoisedComponent as QuoteTable }

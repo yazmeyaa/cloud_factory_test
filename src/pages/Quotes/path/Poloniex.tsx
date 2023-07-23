@@ -4,6 +4,7 @@ import { FormattedTickers, PoloniexAdapterResultType, poloniexDataAdapter } from
 import { QuoteTable } from "components/quoteTable"
 import { Modal } from "components/modal"
 import { SingleQuoteTable } from "components/singleQuoteTable"
+import { useLocation } from "react-router-dom"
 
 export const Poloniex = () => {
     const [data, setData] = useState<PoloniexAdapterResultType | null>()
@@ -11,6 +12,8 @@ export const Poloniex = () => {
     const [selectedQuote, setSelectedQuote] = useState<FormattedTickers | null>(null)
     const [openModal, setOpenModal] = useState(false)
     const timerRef = useRef<NodeJS.Timer | null>(null)
+    const {pathname} = useLocation()
+    const domain = pathname === '/quotes/xeinolop' ? 'Xeinolop' : 'Poloniex'
 
     async function loadData() {
         poloniexService.public.getTickers()
@@ -42,7 +45,7 @@ export const Poloniex = () => {
         
         timerRef.current = setInterval(() => {
             loadData()
-        }, 1000)
+        }, 5000)
         return () => clearInterval(timerRef.current!)
     }, [])
 
@@ -55,6 +58,7 @@ export const Poloniex = () => {
 
     return (
         <>
+            <h1>Актуальные котировки от {domain}</h1>
             <QuoteTable quotes={data} onRowClick={handleTableRowClick} />
             {(selectedQuote && openModal) && <Modal heading={selectedQuote.displayName} onClose={handleCloseModal} >
                 <SingleQuoteTable quote={selectedQuote} />

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { columnsMap } from "services/poloniex";
+import { columnsMap } from "helpers/poloniexFieldsMap";
 import { Tickers } from "types/poloniex";
 
 export type SingleQuoteTableProps = {

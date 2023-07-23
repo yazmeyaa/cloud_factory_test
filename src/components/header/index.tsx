@@ -11,10 +11,7 @@ export const AppHeader = () => {
                     </li>
                     <i className="vertical_line" />
                     <li>
-                        <Link to="/quotes/poloniex">Poloniex</Link>
-                    </li>
-                    <li>
-                        <Link to="/quotes/xeinolop">Xeinolop</Link>
+                        <Link to="/quotes">Котировки</Link>
                     </li>
                 </ul>
             </nav>

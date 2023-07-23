@@ -1,19 +1,7 @@
 import { Markets, TickersResponseType } from "types/poloniex"
 import axios from 'axios'
 
-const dataMap = {
-    "id": "ID тикера",
-    "last": "Последняя цена сделки",
-    "lowestAsk": "Наименьшая цена покупки",
-    "highestBid": "Наивысшая цена продажи",
-    "percentChange": "Изменение цены %",
-    "baseVolume": "Объем базовой валюты (за 24 часа)",
-    "quoteVolume": "Объем котируемой валюты (за 24 часа)",
-    "isFrozen": "Рынок заморожен",
-    "postOnly": "Только размещение ордеров",
-    "high24hr": "Наивысшая цена за 24 часа",
-    "low24hr": "Наименьшая цена за 24 часа"
-  }
+
 
 export class Market {
     private path: string
@@ -78,4 +66,3 @@ export class PoloniexService {
 
 export const poloniexService = new PoloniexService()
 
-export {dataMap as columnsMap}

@@ -1,5 +1,6 @@
 export interface ToastProperties {
-    title: string
+    id: number
+    title?: string
     description: string
-    kind: 'alert' | 'info' | 'warning'
+    kind?: 'alert' | 'info' | 'warning'
 }

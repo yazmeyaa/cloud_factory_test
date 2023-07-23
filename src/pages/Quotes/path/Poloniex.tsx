@@ -5,6 +5,8 @@ import { QuoteTable } from "components/quoteTable"
 import { Modal } from "components/modal"
 import { SingleQuoteTable } from "components/singleQuoteTable"
 import { useLocation } from "react-router-dom"
+import { toastsStore } from "shared/stores/toast"
+import { AxiosError } from "axios"
 
 export const Poloniex = () => {
     const [data, setData] = useState<PoloniexAdapterResultType | null>()
@@ -12,10 +14,11 @@ export const Poloniex = () => {
     const [selectedQuote, setSelectedQuote] = useState<FormattedTickers | null>(null)
     const [openModal, setOpenModal] = useState(false)
     const timerRef = useRef<NodeJS.Timer | null>(null)
-    const {pathname} = useLocation()
+    const { pathname } = useLocation()
     const domain = pathname === '/quotes/xeinolop' ? 'Xeinolop' : 'Poloniex'
 
     async function loadData() {
+        toastsStore.removeAllToasts()
         poloniexService.public.getTickers()
             .then(res => {
                 const data = poloniexDataAdapter(res)
@@ -23,7 +26,16 @@ export const Poloniex = () => {
                 const arrayHalf = data.slice(0, (data.length - 1) / 2)
                 setData(arrayHalf)
             })
-            .catch(console.error)
+            .catch(error => {
+                if (error instanceof AxiosError) {
+                    toastsStore.addToast({
+                        kind: 'alert',
+                        description: error.code + '. See console.' ?? 'Unexpected error, see console',
+                        title: error.name
+                    })
+                    console.log(error)
+                }
+            })
     }
 
     function handleTableRowClick(quote: FormattedTickers) {
@@ -42,7 +54,7 @@ export const Poloniex = () => {
             .finally(() => {
                 setLoading(false)
             });
-        
+
         timerRef.current = setInterval(() => {
             loadData()
         }, 5000)

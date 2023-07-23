@@ -1,7 +1,7 @@
 import { FC, memo, useEffect, useRef, useState } from "react"
 import './style.scss'
 import { FormattedTickers, PoloniexAdapterResultType } from "helpers/poloniexDataAdapter"
-import { isEqual, pick } from 'lodash'
+import { isEqual } from 'lodash'
 
 export type QuoteTableProps = {
     quotes: PoloniexAdapterResultType
@@ -28,16 +28,7 @@ const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
         percentChange: "Процент изменения цены"
     } as const
 
-    useEffect(() => {
-        const updatedRows: number[] = [];
-        for (let i = 0; i < quotes.length - 1; i++) {
-            if (!isEqualByColumns(quotes[i], prevQuotes.current[i], columnsKeys)) {
-                updatedRows.push(i);
-            }
-        }
-        setChangedRows(updatedRows);
-        prevQuotes.current = quotes;
-    }, [quotes]);
+
 
     const columnsKeys = Object.keys(columnsMap)
     const columns = Object.values(columnsMap)
@@ -48,6 +39,18 @@ const QuoteTable: FC<QuoteTableProps> = ({ quotes, onRowClick }) => {
     const handleAnimationEnd = (rowIdx: number) => {
         setChangedRows((prevChangedRows) => prevChangedRows.filter((idx) => idx !== rowIdx));
     };
+
+    useEffect(() => {
+        const updatedRows: number[] = [];
+        for (let i = 0; i < quotes.length - 1; i++) {
+            if (!isEqualByColumns(quotes[i], prevQuotes.current[i], columnsKeys)) {
+                updatedRows.push(i);
+            }
+        }
+        setChangedRows(updatedRows);
+        prevQuotes.current = quotes;
+        // eslint-disable-next-line
+    }, [quotes]);
 
     return (
         <div className="quote_table_container">

@@ -16,6 +16,14 @@ setTimeout(() => {
   }, 7000)
 }, 1000 * 60 * 2)
 
+setTimeout(() => {
+  toastsStore.addToast({
+    kind: 'info',
+    title: 'CORS',
+    description: 'Необходимо отключить проверку CORS в браузере чтобы данные загружались из API.'
+  })
+}, 2000)
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

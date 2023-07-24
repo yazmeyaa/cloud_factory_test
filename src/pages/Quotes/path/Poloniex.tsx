@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { poloniexService } from "services/poloniex"
 import { FormattedTickers, PoloniexAdapterResultType, poloniexDataAdapter } from "helpers/poloniexDataAdapter"
 import { QuoteTable } from "components/quoteTable"
@@ -17,7 +17,8 @@ export const Poloniex = () => {
     const { pathname } = useLocation()
     const domain = pathname === '/quotes/xeinolop' ? 'Xeinolop' : 'Poloniex'
 
-    async function loadData() {
+    const loadData = useCallback(async () => {
+        if (openModal) return;
         toastsStore.removeAllToasts()
         poloniexService.public.getTickers()
             .then(res => {
@@ -36,7 +37,7 @@ export const Poloniex = () => {
                     console.error(error)
                 }
             })
-    }
+    }, [openModal])
 
     function handleTableRowClick(quote: FormattedTickers) {
         setOpenModal(true)
@@ -56,10 +57,12 @@ export const Poloniex = () => {
             });
 
         timerRef.current = setInterval(() => {
-            loadData()
+            if(!openModal) {
+                loadData()
+            }
         }, 5000)
         return () => clearInterval(timerRef.current!)
-    }, [])
+    }, [loadData, openModal])
 
 
     if (!data || (data && loading)) {

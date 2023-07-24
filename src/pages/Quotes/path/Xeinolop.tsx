@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom"
 import { toastsStore } from "shared/stores/toast"
 import { AxiosError } from "axios"
 
-export const Poloniex = () => {
+export const Xeinolop = () => {
     const [data, setData] = useState<PoloniexAdapterResultType | null>()
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedQuote, setSelectedQuote] = useState<FormattedTickers | null>(null)

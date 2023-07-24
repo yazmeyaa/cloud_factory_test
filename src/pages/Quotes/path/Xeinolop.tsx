@@ -1,20 +1,24 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { poloniexService } from "services/poloniex"
 import { FormattedTickers, PoloniexAdapterResultType, poloniexDataAdapter } from "helpers/poloniexDataAdapter"
 import { QuoteTable } from "components/quoteTable"
 import { Modal } from "components/modal"
 import { SingleQuoteTable } from "components/singleQuoteTable"
 import { useLocation } from "react-router-dom"
+import { toastsStore } from "shared/stores/toast"
+import { AxiosError } from "axios"
 
-export const Xeinolop = () => {
+export const Poloniex = () => {
     const [data, setData] = useState<PoloniexAdapterResultType | null>()
     const [loading, setLoading] = useState<boolean>(false)
     const [selectedQuote, setSelectedQuote] = useState<FormattedTickers | null>(null)
     const [openModal, setOpenModal] = useState(false)
-    const {pathname} = useLocation()
+    const timerRef = useRef<NodeJS.Timer | null>(null)
+    const { pathname } = useLocation()
     const domain = pathname === '/quotes/xeinolop' ? 'Xeinolop' : 'Poloniex'
 
     async function loadData() {
+        toastsStore.removeAllToasts()
         poloniexService.public.getTickers()
             .then(res => {
                 const data = poloniexDataAdapter(res)
@@ -22,7 +26,16 @@ export const Xeinolop = () => {
                 const arrayHalf = data.slice((data.length - 1) / 2, data.length - 1)
                 setData(arrayHalf)
             })
-            .catch(console.error)
+            .catch(error => {
+                if (error instanceof AxiosError) {
+                    toastsStore.addToast({
+                        kind: 'alert',
+                        description: error.code + '. See console.' ?? 'Unexpected error, see console',
+                        title: error.name
+                    })
+                    console.error(error)
+                }
+            })
     }
 
     function handleTableRowClick(quote: FormattedTickers) {
@@ -40,7 +53,12 @@ export const Xeinolop = () => {
         loadData()
             .finally(() => {
                 setLoading(false)
-            })
+            });
+
+        timerRef.current = setInterval(() => {
+            loadData()
+        }, 5000)
+        return () => clearInterval(timerRef.current!)
     }, [])
 
 

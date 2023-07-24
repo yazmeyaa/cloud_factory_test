@@ -35,7 +35,23 @@ export const Xeinolop = () => {
                         title: error.name
                     })
                     console.error(error)
+                    return;
                 }
+                if(error instanceof Error) {
+                    toastsStore.addToast({
+                        kind: 'alert',
+                        description: error.message + '. See console.' ?? 'Unexpected error, see console',
+                        title: error.name
+                    })
+                    console.error(error)
+                    return;
+                }
+                toastsStore.addToast({
+                    kind: 'alert',
+                    description: 'Unexpected error. See console.' ?? 'Unexpected error, see console',
+                    title: 'Error'
+                })
+                console.error(error)
             })
     }, [openModal])
 

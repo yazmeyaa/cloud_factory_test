@@ -33,7 +33,7 @@ export const Poloniex = () => {
                         description: error.code + '. See console.' ?? 'Unexpected error, see console',
                         title: error.name
                     })
-                    console.log(error)
+                    console.error(error)
                 }
             })
     }
